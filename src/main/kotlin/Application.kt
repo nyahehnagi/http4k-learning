@@ -60,12 +60,6 @@ class Application() {
 
     val routingServer = routing.asServer(Jetty(9000)).start()
 
-    fun prettyPrint(rawJson : String) : String {
-        val mapper = ObjectMapper()
-        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rawJson)
-    }
-
-
 }
 
 class RenderHTML() {
