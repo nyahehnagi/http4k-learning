@@ -1,5 +1,10 @@
 package http4klearning
 
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import org.http4k.core.HttpHandler
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -15,10 +20,12 @@ import org.http4k.server.asServer
 
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.body.form
+import org.http4k.format.Jackson
+import java.net.URL
+
 
 class Application() {
     val renderHTML = RenderHTML()
-
     val pingPongHandler: HttpHandler = { _ -> Response(OK).body("pong") }
 
     val greetHandler: HttpHandler = { request: Request ->
@@ -33,19 +40,16 @@ class Application() {
     val planetReciever: HttpHandler = { request: Request ->
         val planetNumber: String? = request.form(("planet"))
         val response = getPlanet(planetNumber)
-        Response(OK).body(response.body)
+        Response(OK).body(response)
     }
 
+    fun getPlanet(planet: String?): String {
+        val starWarsPlanetEndPoint  = "https://swapi.co/api/planets/$planet/?format=json"
+        val mapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        var planetValue  = mapper.readValue<Planet>(URL(starWarsPlanetEndPoint))
+        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(planetValue)
 
-    fun getPlanet(planet: String?): Response {
-        val starWarsPlanetEndPoint  ="https://swapi.co/api/planets/$planet/?format=json"
-        val request = Request(GET, starWarsPlanetEndPoint )
-
-        return ApacheClient()(request)
-        //val client: HttpHandler = ApacheClient()
-        //return client(request)
     }
-
 
     val routing: RoutingHttpHandler = routes(
         "/ping" bind GET to pingPongHandler,
@@ -55,6 +59,13 @@ class Application() {
     )
 
     val routingServer = routing.asServer(Jetty(9000)).start()
+
+    fun prettyPrint(rawJson : String) : String {
+        val mapper = ObjectMapper()
+        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rawJson)
+    }
+
+
 }
 
 class RenderHTML() {
