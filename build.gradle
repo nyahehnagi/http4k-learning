@@ -18,9 +18,9 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
     compile group: "com.typesafe", name: "config", version: "1.4.0"
-    compile group: "org.http4k", name: "http4k-core", version: "3.189.0"
-    compile group: "org.http4k", name: "http4k-server-jetty", version: "3.189.0"
-    compile group: "org.http4k", name: "http4k-client-apache", version: "3.189.0"
+    compile group: "org.http4k", name: "http4k-core", version: "3.194.0"
+    compile group: "org.http4k", name: "http4k-server-jetty", version: "3.194.0"
+    compile group: "org.http4k", name: "http4k-client-apache", version: "3.194.0"
 
     
 }
