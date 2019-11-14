@@ -1,12 +1,13 @@
 package http4klearning
 
 
-
 fun main(){
-    startApplication()
+    startApplication(Dependencies(Configuration()))
 }
 
-fun startApplication(){
-    val app = Application()
+fun startApplication(dependencies: Dependencies){
+    val application = Application(dependencies)
 }
+
+
 

@@ -1,8 +1,6 @@
 package http4klearning
 
 import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.http4k.core.HttpHandler
@@ -14,17 +12,16 @@ import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.routes
 
-import org.http4k.client.ApacheClient
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.body.form
-import org.http4k.format.Jackson
 import java.net.URL
 
 
-class Application() {
+class Application(val dependencies: Dependencies) {
+
     val renderHTML = RenderHTML()
     val pingPongHandler: HttpHandler = { _ -> Response(OK).body("pong") }
 
@@ -44,11 +41,11 @@ class Application() {
     }
 
     fun getPlanet(planet: String?): String {
+        val endpoint = dependencies.configuration().starWarsConfig.planetsEndPoint
         val starWarsPlanetEndPoint  = "https://swapi.co/api/planets/$planet/?format=json"
         val mapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         var planetValue  = mapper.readValue<Planet>(URL(starWarsPlanetEndPoint))
         return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(planetValue)
-
     }
 
     val routing: RoutingHttpHandler = routes(
